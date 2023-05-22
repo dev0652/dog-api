@@ -12,6 +12,7 @@ export class App extends Component {
   state = {
     breeds: [],
     dog: null,
+    error: null,
   };
 
   async componentDidMount() {
@@ -25,12 +26,14 @@ export class App extends Component {
     try {
       const response = await axios.get('/images/search', {
         params: {
-          breed_ids: option.value,
+          breed_id: option.value,
         },
       });
 
       this.setState({ dog: response.data[0] });
-    } catch (error) {}
+    } catch (error) {
+      this.setState({ error });
+    }
   };
 
   buildSelectOptions = () => {
