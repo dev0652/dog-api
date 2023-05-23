@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import Select from 'react-select';
 // import { GlobalStyle } from './GlobalStyle';
+import { Dog } from './Dog/Dog';
 
-axios.defaults.baseURL = 'https://api.thedogapi.com/v1';
-axios.defaults.headers.common['x-api-key'] = process.env.REACT_APP_API_KEY;
+import { fetchBreeds } from 'api';
+import { fetchDogByBreed } from 'api';
+import { BreedSelect } from './BreedSelect/BreedSelect';
 
 // ##################################################
 
@@ -15,48 +15,44 @@ export class App extends Component {
     error: null,
   };
 
+  // #### Lifecycle
+
   async componentDidMount() {
     try {
-      const response = await axios.get('/breeds');
-      this.setState({ breeds: response.data });
-    } catch (error) {}
+      const breeds = await fetchBreeds();
+      this.setState({ breeds: breeds });
+    } catch (error) {
+      this.setState({
+        error:
+          'Oops, something went wrong. Please try again or reload the page',
+      });
+    }
   }
 
-  selectBreed = async option => {
-    try {
-      const response = await axios.get('/images/search', {
-        params: {
-          breed_id: option.value,
-        },
-      });
+  // #### Methods
 
-      this.setState({ dog: response.data[0] });
+  selectBreed = async breedId => {
+    try {
+      const dog = await fetchDogByBreed(breedId);
+      this.setState({ dog });
     } catch (error) {
-      this.setState({ error });
+      this.setState({
+        error:
+          'Oops, something went wrong. Please try again or reload the page',
+      });
     }
   };
 
-  buildSelectOptions = () => {
-    return this.state.breeds.map(breed => ({
-      value: breed.id,
-      label: breed.name,
-    }));
-  };
+  // #### Rendering
 
   render() {
-    const options = this.buildSelectOptions();
-    const { dog } = this.state;
+    const { dog, error, breeds } = this.state;
 
     return (
       <>
-        <Select options={options} onChange={this.selectBreed} />
-
-        {dog && (
-          <div>
-            <img src={dog.url} width="480" alt="dog" />
-          </div>
-        )}
-
+        <BreedSelect breeds={breeds} onSelect={this.selectBreed} />;
+        {error && <div>{error}</div>}
+        {dog && <Dog dog={dog} />}
         {/* <GlobalStyle/> */}
       </>
     );
