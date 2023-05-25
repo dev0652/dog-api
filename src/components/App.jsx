@@ -1,58 +1,58 @@
 import React, { Component } from 'react';
 // import { GlobalStyle } from './GlobalStyle';
-import { Dog } from './Dog/Dog';
+// import { PulseLoader } from 'react-spinners';
+import DoorDashFavorite from './DogSkeleton';
 
-import { fetchBreeds } from 'api';
+import { Dog } from './Dog';
 import { fetchDogByBreed } from 'api';
-import { BreedSelect } from './BreedSelect/BreedSelect';
+import { BreedSelect } from './BreedSelect';
+import { ErrorMessage } from './Error';
 
 // ##################################################
 
 export class App extends Component {
   state = {
-    breeds: [],
     dog: null,
     error: null,
+    isLoading: false,
   };
 
   // #### Lifecycle
-
-  async componentDidMount() {
-    try {
-      const breeds = await fetchBreeds();
-      this.setState({ breeds: breeds });
-    } catch (error) {
-      this.setState({
-        error:
-          'Oops, something went wrong. Please try again or reload the page',
-      });
-    }
-  }
 
   // #### Methods
 
   selectBreed = async breedId => {
     try {
+      this.setState({ isLoading: true });
+
       const dog = await fetchDogByBreed(breedId);
       this.setState({ dog });
-    } catch (error) {
+    } catch {
       this.setState({
         error:
           'Oops, something went wrong. Please try again or reload the page',
       });
+    } finally {
+      this.setState({ isLoading: false });
     }
   };
 
   // #### Rendering
 
   render() {
-    const { dog, error, breeds } = this.state;
+    const { dog, error, isLoading } = this.state;
+    const { selectBreed } = this;
 
     return (
       <>
-        <BreedSelect breeds={breeds} onSelect={this.selectBreed} />;
-        {error && <div>{error}</div>}
-        {dog && <Dog dog={dog} />}
+        <BreedSelect onSelect={selectBreed} />
+        {/* <PulseLoader color="purple" loading={isLoading} size={15} /> */}
+
+        {isLoading && <DoorDashFavorite />}
+
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+
+        {dog && !isLoading && <Dog dog={dog} />}
         {/* <GlobalStyle/> */}
       </>
     );
