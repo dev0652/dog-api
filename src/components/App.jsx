@@ -7,6 +7,8 @@ import { Dog } from './Dog';
 import { fetchDogByBreed } from 'api';
 import { BreedSelect } from './BreedSelect';
 import { ErrorMessage } from './Error';
+import { Layout } from './Layout';
+import { errorMessages } from 'constants';
 
 // ##################################################
 
@@ -29,8 +31,7 @@ export class App extends Component {
       this.setState({ dog });
     } catch {
       this.setState({
-        error:
-          'Oops, something went wrong. Please try again or reload the page',
+        error: errorMessages.fetchDog,
       });
     } finally {
       this.setState({ isLoading: false });
@@ -44,7 +45,7 @@ export class App extends Component {
     const { selectBreed } = this;
 
     return (
-      <>
+      <Layout>
         <BreedSelect onSelect={selectBreed} />
         {/* <PulseLoader color="purple" loading={isLoading} size={15} /> */}
 
@@ -54,7 +55,7 @@ export class App extends Component {
 
         {dog && !isLoading && <Dog dog={dog} />}
         {/* <GlobalStyle/> */}
-      </>
+      </Layout>
     );
   }
 }

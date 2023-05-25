@@ -3,6 +3,7 @@ import Select from 'react-select';
 
 import { fetchBreeds } from 'api';
 import { ErrorMessage } from './Error';
+import { errorMessages } from 'constants';
 
 // ##################################################
 
@@ -23,8 +24,7 @@ export class BreedSelect extends Component {
       this.setState({ breeds });
     } catch {
       this.setState({
-        error:
-          'Oops, something went wrong. Please try again or reload the page',
+        error: errorMessages.fetchBreeds,
       });
     } finally {
       this.setState({ isLoading: false });
